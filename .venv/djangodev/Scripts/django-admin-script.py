@@ -1,4 +1,4 @@
-#!F:\GitHub\.venv\djangodev\Scripts\python.exe
+#!F:\GitHub\django\.venv\djangodev\Scripts\python.exe
 # EASY-INSTALL-ENTRY-SCRIPT: 'Django','console_scripts','django-admin'
 import re
 import sys
