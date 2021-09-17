@@ -136,6 +136,9 @@ class RawQuery:
         self.cursor.execute(self.sql, params)
 
 
+ExplainInfo = namedtuple('ExplainInfo', ('format', 'options'))
+
+
 class Query(BaseExpression):
     """A single SQL query."""
 
@@ -227,9 +230,7 @@ class Query(BaseExpression):
 
         self._filtered_relations = {}
 
-        self.explain_query = False
-        self.explain_format = None
-        self.explain_options = {}
+        self.explain_info = None
 
     @property
     def output_field(self):
@@ -303,9 +304,7 @@ class Query(BaseExpression):
         obj.table_map = self.table_map.copy()
         obj.where = self.where.clone()
         obj.annotations = self.annotations.copy()
-        if self.annotation_select_mask is None:
-            obj.annotation_select_mask = None
-        else:
+        if self.annotation_select_mask is not None:
             obj.annotation_select_mask = self.annotation_select_mask.copy()
         obj.combined_queries = tuple(query.clone() for query in self.combined_queries)
         # _annotation_select_cache cannot be copied, as doing so breaks the
@@ -315,13 +314,9 @@ class Query(BaseExpression):
         # used.
         obj._annotation_select_cache = None
         obj.extra = self.extra.copy()
-        if self.extra_select_mask is None:
-            obj.extra_select_mask = None
-        else:
+        if self.extra_select_mask is not None:
             obj.extra_select_mask = self.extra_select_mask.copy()
-        if self._extra_select_cache is None:
-            obj._extra_select_cache = None
-        else:
+        if self._extra_select_cache is not None:
             obj._extra_select_cache = self._extra_select_cache.copy()
         if self.select_related is not False:
             # Use deepcopy because select_related stores fields in nested
@@ -551,9 +546,7 @@ class Query(BaseExpression):
 
     def explain(self, using, format=None, **options):
         q = self.clone()
-        q.explain_query = True
-        q.explain_format = format
-        q.explain_options = options
+        q.explain_info = ExplainInfo(format, options)
         compiler = q.get_compiler(using=using)
         return '\n'.join(compiler.explain_query())
 
