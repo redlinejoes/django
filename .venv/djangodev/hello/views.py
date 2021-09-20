@@ -3,11 +3,16 @@ import re
 from django.utils.timezone import datetime
 from django.http import HttpResponse
 
+# Easy access to URL
+urlHelloVSCode = "http://127.0.0.1:8000/hello/VSCode"
+print(urlHelloVSCode)
+
 # Create your views here.
 def home(request):
     return HttpResponse("Hello, Django!")
 
 def hello_there(request, name):
+
     now = datetime.now()
     formatted_now = now.strftime("%A, %d %B, %Y at %I:%M %p")
 
